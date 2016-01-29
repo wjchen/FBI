@@ -12,6 +12,8 @@
 #include "rop.h"
 #include "ui.hpp"
 #include "3dsdb/3dsdb.h"
+#include "ttf/Font.hpp"
+#include "ttf/Color.hpp"
 
 
 #include <sys/stat.h>
@@ -415,6 +417,7 @@ bool onLoop() {
     return breakLoop;
 }
 
+
 int main(int argc, char **argv) {
     if(!core::init(argc)) {
         return 0;
@@ -423,11 +426,27 @@ int main(int argc, char **argv) {
     game_map_init();
     uiInit();
 
+    std::string path = "/wqy-microhei.ttf";
+
+    const char *cstr =  "测试中文";
+    std::string str1 =  "测试中文";
+    std::wstring wstr2 = L"日本語テスト";
+
+    Font fnt = Font(path);
+    Color blackColor = Color(0.0, 0.0, 0.0);
+    Color whiteColor = Color(255.0, 255.0, 255.0);
+    if(fnt.isLoaded()) {
+        fnt.drawString(0, 0, cstr, whiteColor);
+        fnt.drawString(0, 20, str1, whiteColor);
+        fnt.drawStringUnicode(0, 40, wstr2, whiteColor);
+    } else {
+        uiDisplayMessage(gpu::SCREEN_BOTTOM, "Load font failed...");
+    }
+
     freeSpace = fs::freeSpace(destination);
     while(core::running()) {
         if(mode == INSTALL_CIA || mode == DELETE_CIA) {
             uiDisplayMessage(gpu::SCREEN_BOTTOM, "Loading file list...");
-
             std::string fileTarget;
             uiSelectFile(&fileTarget, "/", extensions, [&](const std::string currDirectory, bool inRoot, bool &updateList) {
                 if(hid::pressed(hid::BUTTON_X)) {
